@@ -3,257 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CS.ID - Data Samsat Nasional</title>
+    <title>CS.ID - Aplikasi Data Samsat Nasional</title>
     
+    <!-- PWA & Mobile Optimization -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
-    <script src="https://unpkg.com"></script>
+    <meta name="mobile-web-app-capable" content="yes">
     
     <style>
         @import url('https://googleapis.com');
 
         :root {
-            --bg-dark: #000000;
-            --bg-light: #121212;
-            --text-primary: #ffffff;
-            --text-secondary: #b3b3b3;
-            --gold-primary: #FFD700;
+            --gold: #FFD700;
+            --bg: #000000;
+            --card: #121212;
+            --input-bg: #0a0a0a;
+            --text: #ffffff;
+            --text-dim: #888888;
             --danger: #ff4d4d;
             --success: #2ecc71;
-            --border-color: #2a2a2a;
-            --font-family: 'Poppins', sans-serif;
+            --border: #222222;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: var(--font-family);
-            background-color: #080808;
-            color: var(--text-primary);
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .container {
             width: 100%;
             max-width: 420px;
-            background-color: var(--bg-dark);
+            background-color: var(--bg);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            position: relative;
         }
 
-        .header {
-            background-color: var(--bg-light);
-            padding: 18px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 2px solid var(--gold-primary);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .content-area { flex-grow: 1; padding: 20px; padding-bottom: 30px; }
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        #plateView {
-            background: #000;
-            border: 2px solid var(--gold-primary);
-            padding: 22px;
-            text-align: center;
-            color: var(--gold-primary);
-            font-size: 1.8em;
-            font-weight: 900;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            min-height: 85px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /* --- HALAMAN LOGIN --- */
+        .login-screen { padding: 50px 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 100vh; }
+        .logo-main { color: var(--gold); font-size: 3.5em; font-weight: 800; margin-bottom: 5px; }
+        .sub-logo { font-size: 0.8em; font-weight: 700; letter-spacing: 1px; margin-bottom: 30px; }
 
+        /* --- CARD STYLE (LOGIN & DAFTAR) --- */
+        .card-form { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--border); width: 100%; text-align: left; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.7em; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        .input-group input { width: 100%; background: var(--input-bg); border: 1px solid #333; padding: 14px; border-radius: 10px; color: white; outline: none; font-size: 0.9em; }
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 16px; width: 100%; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+
+        /* --- HALAMAN DAFTAR --- */
+        .header-reg { display: flex; align-items: center; gap: 15px; padding: 20px; color: var(--gold); }
+        .back-arrow { font-size: 1.5em; cursor: pointer; }
+
+        /* --- HALAMAN PENCARIAN --- */
+        .app-header { background: var(--card); padding: 15px 20px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        #plateView { background: #000; border: 2px solid var(--gold); padding: 20px; text-align: center; color: var(--gold); font-size: 1.8em; font-weight: 800; border-radius: 12px; margin: 20px 0; min-height: 85px; display: flex; align-items: center; justify-content: center; }
+        
         .kb-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 10px; }
         .kb-alpha { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
-        .key {
-            background: #1e1e1e;
-            border: 1px solid #333;
-            color: #fff;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .key:active { background: var(--gold-primary); color: #000; }
-        .key-action { background: var(--gold-primary); color: #000; grid-column: span 2; }
-        .key-search { background: var(--success); color: #fff; grid-column: span 4; font-weight: 900; }
+        .key { background: #1e1e1e; color: #fff; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 8px; cursor: pointer; border: 1px solid #333; }
+        .key:active { background: var(--gold); color: #000; }
+        .key-del { background: var(--gold); color: #000; grid-column: span 2; }
+        .key-go { background: var(--success); color: #fff; grid-column: span 4; font-weight: 800; }
 
-        .res-banner { background: var(--gold-primary); color: #000; padding: 15px; font-weight: 900; text-align: center; letter-spacing: 2px; }
-        .res-section-title { color: var(--gold-primary); font-size: 0.9em; font-weight: 800; margin: 20px 0 10px 0; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        .res-line { display: flex; margin-bottom: 8px; font-size: 0.85em; }
-        .res-label { width: 130px; color: var(--text-secondary); flex-shrink: 0; }
-        .res-val { color: #fff; font-weight: 600; flex: 1; text-transform: uppercase; }
+        /* --- RIWAYAT --- */
+        .history-item { background: #111; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; border: 1px solid #222; }
 
-        .loader { width: 40px; height: 40px; border: 4px solid #333; border-top-color: var(--gold-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        /* --- HASIL --- */
+        .res-banner { background: var(--gold); color: #000; padding: 15px; font-weight: 900; text-align: center; border-radius: 15px 15px 0 0; letter-spacing: 1px; }
+        .res-body { background: var(--card); padding: 20px; border: 1px solid var(--gold); border-top: none; border-radius: 0 0 15px 15px; }
+        .res-section { color: var(--gold); font-weight: 800; margin: 15px 0 8px 0; border-bottom: 1px solid #333; padding-bottom: 5px; font-size: 0.85em; }
+        .row { display: flex; margin-bottom: 6px; font-size: 0.85em; }
+        .label { width: 130px; color: var(--text-dim); flex-shrink: 0; }
+        .val { color: #fff; font-weight: 600; text-transform: uppercase; flex: 1; }
+
+        /* --- LOADER --- */
+        .loader { width: 35px; height: 35px; border: 4px solid #333; border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .wa-btn { background: #25D366; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 25px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1 style="color:var(--gold-primary); font-size:1.4em;">CS.ID SAMSAT</h1>
-        <div style="font-size: 0.7em; color: var(--gold-primary);">USER: HENDRY</div>
+
+    <!-- 1. HALAMAN LOGIN -->
+    <div id="pageLogin" class="login-screen fade-in">
+        <div class="logo-main">CS.ID</div>
+        <div class="sub-logo">APLIKASI DATA SAMSAT NASIONAL</div>
+        <div style="font-size: 0.7em; color: var(--gold); margin-bottom: 25px;">CP ADMIN : 0813-6900-872</div>
+        
+        <div class="card-form">
+            <div class="input-group"><label>USERNAME</label><input type="text" id="lUser" placeholder="ID USER"></div>
+            <div class="input-group"><label>PASSWORD</label><input type="password" id="lPass" placeholder="KATA SANDI"></div>
+            <button class="btn-gold" onclick="navTo('pageSearch')">MASUK SEKARANG</button>
+            <button class="btn-gold" style="background:#222; color:var(--gold); border:1px solid #444; margin-top:12px;">AKSES KHUSUS ADMIN</button>
+            <p style="text-align:center; font-size:0.7em; margin-top:20px; color:#888;">Belum punya akses? <span onclick="navTo('pageRegister')" style="color:var(--gold); font-weight:800; cursor:pointer;">Daftar Agen Baru</span></p>
+        </div>
     </div>
 
-    <div class="content-area">
-        <!-- HALAMAN CARI -->
-        <div id="searchPage" class="fade-in">
-            <p style="font-size: 0.7em; color: var(--gold-primary); margin-bottom: 10px; font-weight: 800;">INPUT PLAT / RANGKA / MESIN :</p>
-            <div id="plateView">MULAI KETIK...</div>
+    <!-- 2. HALAMAN DAFTAR AGEN (SESUAI GAMBAR) -->
+    <div id="pageRegister" class="hidden fade-in">
+        <div class="header-form header-reg">
+            <span class="back-arrow" onclick="navTo('pageLogin')">←</span>
+            <span class="form-title">DAFTAR AGEN BARU</span>
+        </div>
+        <div class="card-form" style="margin: 0 20px;">
+            <div class="input-group"><label>NAMA LENGKAP</label><input type="text" placeholder="Contoh: Mahmud"></div>
+            <div class="input-group"><label>ID USER</label><input type="text" placeholder="Contoh: kinan"></div>
+            <div class="input-group"><label>NO. WHATSAPP</label><input type="number" placeholder="085166349785"></div>
+            <div class="input-group"><label>PASSWORD</label><input type="password" placeholder="******"></div>
+            <button class="btn-gold" onclick="alert('Pendaftaran Berhasil! Mohon tunggu aktivasi Admin.'); navTo('pageLogin')">KIRIM PENDAFTARAN</button>
+        </div>
+    </div>
+
+    <!-- 3. HALAMAN PENCARIAN -->
+    <div id="pageSearch" class="hidden fade-in">
+        <div class="app-header">
+            <h2 style="color:var(--gold); font-size: 1.1em; font-weight:800;">CS.ID SAMSAT</h2>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--gold); font-weight:800; font-size:0.7em;">LOGOUT</button>
+        </div>
+        <div style="padding: 20px;">
+            <p style="font-size:0.7em; color:var(--gold); font-weight:800; margin-bottom:10px;">CARI NOMOR POLISI / RANGKA / MESIN :</p>
+            <div id="plateView">SIAP MENCARI...</div>
 
             <div class="kb-grid">
-                <div class="key" onclick="pressKey('1')">1</div><div class="key" onclick="pressKey('2')">2</div><div class="key" onclick="pressKey('3')">3</div><div class="key" onclick="pressKey('4')">4</div><div class="key" onclick="pressKey('5')">5</div>
-                <div class="key" onclick="pressKey('6')">6</div><div class="key" onclick="pressKey('7')">7</div><div class="key" onclick="pressKey('8')">8</div><div class="key" onclick="pressKey('9')">9</div><div class="key" onclick="pressKey('0')">0</div>
+                <div class="key" onclick="k('1')">1</div><div class="key" onclick="k('2')">2</div><div class="key" onclick="k('3')">3</div><div class="key" onclick="k('4')">4</div><div class="key" onclick="k('5')">5</div>
+                <div class="key" onclick="k('6')">6</div><div class="key" onclick="k('7')">7</div><div class="key" onclick="k('8')">8</div><div class="key" onclick="k('9')">9</div><div class="key" onclick="k('0')">0</div>
             </div>
-
             <div class="kb-alpha">
-                <div class="key" onclick="pressKey('A')">A</div><div class="key" onclick="pressKey('B')">B</div><div class="key" onclick="pressKey('C')">C</div><div class="key" onclick="pressKey('D')">D</div><div class="key" onclick="pressKey('E')">E</div><div class="key" onclick="pressKey('F')">F</div>
-                <div class="key" onclick="pressKey('G')">G</div><div class="key" onclick="pressKey('H')">H</div><div class="key" onclick="pressKey('I')">I</div><div class="key" onclick="pressKey('J')">J</div><div class="key" onclick="pressKey('K')">K</div><div class="key" onclick="pressKey('L')">L</div>
-                <div class="key" onclick="pressKey('M')">M</div><div class="key" onclick="pressKey('N')">N</div><div class="key" onclick="pressKey('O')">O</div><div class="key" onclick="pressKey('P')">P</div><div class="key" onclick="pressKey('Q')">Q</div><div class="key" onclick="pressKey('R')">R</div>
-                <div class="key" onclick="pressKey('S')">S</div><div class="key" onclick="pressKey('T')">T</div><div class="key" onclick="pressKey('U')">U</div><div class="key" onclick="pressKey('V')">V</div><div class="key" onclick="pressKey('W')">W</div><div class="key" onclick="pressKey('X')">X</div>
-                <div class="key" onclick="pressKey('Y')">Y</div><div class="key" onclick="pressKey('Z')">Z</div>
-                <div class="key key-action" onclick="delKey()">HAPUS</div>
-                <div class="key key-search" onclick="fetchSamsat()">CARI DATA SEKARANG</div>
+                <div class="key" onclick="k('A')">A</div><div class="key" onclick="k('B')">B</div><div class="key" onclick="k('C')">C</div><div class="key" onclick="k('D')">D</div><div class="key" onclick="k('E')">E</div><div class="key" onclick="k('F')">F</div>
+                <div class="key" onclick="k('G')">G</div><div class="key" onclick="k('H')">H</div><div class="key" onclick="k('I')">I</div><div class="key" onclick="k('J')">J</div><div class="key" onclick="k('K')">K</div><div class="key" onclick="k('L')">L</div>
+                <div class="key" onclick="k('M')">M</div><div class="key" onclick="k('N')">N</div><div class="key" onclick="k('O')">O</div><div class="key" onclick="k('P')">P</div><div class="key" onclick="k('Q')">Q</div><div class="key" onclick="k('R')">R</div>
+                <div class="key" onclick="k('S')">S</div><div class="key" onclick="k('T')">T</div><div class="key" onclick="k('U')">U</div><div class="key" onclick="k('V')">V</div><div class="key" onclick="k('W')">W</div><div class="key" onclick="k('X')">X</div>
+                <div class="key" onclick="k('Y')">Y</div><div class="key" onclick="k('Z')">Z</div>
+                <div class="key key-del" onclick="del()">HAPUS</div>
+                <div class="key key-go" onclick="proses()">CARI DATA SEKARANG</div>
             </div>
-        </div>
 
-        <!-- HALAMAN HASIL -->
-        <div id="resultPage" class="hidden fade-in">
-            <div id="resultContent"></div>
-            <button class="btn" style="background:#333; color:white; margin-top:15px; padding:12px; border-radius:8px; border:none; width:100%; font-weight:700;" onclick="location.reload()">CARI DATA LAIN</button>
+            <div style="margin-top:25px;">
+                <p style="font-size:0.7em; color:var(--text-dim); font-weight:800; margin-bottom:10px;">RIWAYAT TERAKHIR :</p>
+                <div id="hList"></div>
+            </div>
         </div>
     </div>
+
+    <!-- 4. HALAMAN HASIL -->
+    <div id="pageResult" class="hidden fade-in" style="padding: 20px;">
+        <div id="out"></div>
+        <button class="btn-gold" style="background:#222; color:#fff;" onclick="navTo('pageSearch')">KEMBALI KE PENCARIAN</button>
+    </div>
+
 </div>
 
 <script>
-    let currentInput = "";
-    window.lastData = null;
+    let s = ""; 
+    let history = JSON.parse(localStorage.getItem('cs_history')) || [];
 
-    function pressKey(val) {
-        if (currentInput.length < 20) {
-            currentInput += val;
-            document.getElementById('plateView').innerText = currentInput;
-        }
+    function navTo(id) {
+        document.querySelectorAll('.container > div').forEach(d => d.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        if(id === 'pageSearch') renderH();
     }
 
-    function delKey() {
-        currentInput = currentInput.slice(0, -1);
-        document.getElementById('plateView').innerText = currentInput || "MULAI KETIK...";
+    // Keyboard Logic
+    const k = (v) => { if(s.length < 25) { s += v; document.getElementById('plateView').innerText = s; } };
+    const del = () => { s = s.slice(0, -1); document.getElementById('plateView').innerText = s || "SIAP MENCARI..."; };
+
+    // History Logic
+    function renderH() {
+        const l = document.getElementById('hList');
+        if(history.length === 0) l.innerHTML = '<p style="font-size:0.7em; color:#444;">Belum ada riwayat.</p>';
+        else l.innerHTML = history.map(i => `<div class="history-item"><span style="color:var(--gold); font-weight:700; cursor:pointer;" onclick="runH('${i}')">${i}</span><span onclick="delH('${i}')" style="color:var(--danger); cursor:pointer;">&times;</span></div>`).join('');
     }
+    function runH(v) { s = v; document.getElementById('plateView').innerText = s; proses(); }
+    function delH(v) { history = history.filter(h => h !== v); localStorage.setItem('cs_history', JSON.stringify(history)); renderH(); }
 
-    const fetchSamsat = async () => {
-        if (!currentInput) { alert("Input Kosong!"); return; }
+    // API Process
+    async function proses() {
+        if(!s) return alert("Masukkan Nomor!");
+        const clean = s.replace(/\s/g,'').toUpperCase();
+        
+        // Simpan Riwayat
+        if(!history.includes(clean)) { history.unshift(clean); if(history.length > 5) history.pop(); localStorage.setItem('cs_history', JSON.stringify(history)); }
 
-        document.getElementById('searchPage').classList.add('hidden');
-        document.getElementById('resultPage').classList.remove('hidden');
-        const container = document.getElementById('resultContent');
-
-        container.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; padding:60px 0;">
-                                   <div class="loader"></div>
-                                   <p style="margin-top:20px; color:var(--gold-primary); font-weight:800;">SEDANG MENGAMBIL DATA...</p>
-                               </div>`;
+        navTo('pageResult');
+        const out = document.getElementById('out');
+        out.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;padding:70px 0;"><div class="loader"></div><p style="color:var(--gold);margin-top:20px;font-weight:800;">PROSES DATA SERVER...</p></div>`;
 
         try {
-            const API_KEY = "9611bbce88d6dbd96cdfd83619233efb";
-            const API_BASE = "https://elangninja.space";
-            const res = await fetch(`${API_BASE}?key=${API_KEY}&s=${currentInput.toUpperCase()}`);
-            const data = await res.json();
+            const api = `https://elangninja.space{clean}`;
+            const prox = `https://allorigins.win{encodeURIComponent(api)}`;
+            const r = await fetch(prox);
+            const j = await r.json();
+            const data = JSON.parse(j.contents);
 
-            if (data && data.length > 0) {
-                window.lastData = data[0];
-                renderResult(data[0]);
-            } else {
-                container.innerHTML = `<div style="padding:50px 20px; text-align:center; color:var(--danger); border:1px solid #333; border-radius:12px; font-weight:800;">DATA TIDAK DITEMUKAN</div>`;
-            }
-        } catch (e) {
-            container.innerHTML = `<div style="padding:50px 20px; text-align:center; color:var(--danger);">GAGAL TERHUBUNG KE SERVER</div>`;
-        }
-    };
+            if(data && data.length > 0) {
+                window.last = data;
+                const u = (t) => (t ? t.toString().toUpperCase() : '-');
+                out.innerHTML = `
+                    <div class="res-banner">APLIKASI CS.ID</div>
+                    <div class="res-body">
+                        <div class="res-section">IDENTITAS PEMILIK : ⬇️</div>
+                        <div class="row"><span class="label">NO. POLISI</span><span class="val">: ${u(data.nopol)}</span></div>
+                        <div class="row"><span class="label">PEMILIK</span><span class="val">: ${u(data.nama_pemilik)}</span></div>
+                        <div class="row"><span class="label">ALAMAT</span><span class="val">: ${u(data.alamat)}</span></div>
+                        <div class="row"><span class="label">NIK</span><span class="val">: ${u(data.nik)}</span></div>
+                        <div class="row"><span class="label">PEKERJAAN</span><span class="val">: ${u(data.pekerjaan)}</span></div>
+                        
+                        <div class="res-section">DATA KENDARAAN : ⬇️</div>
+                        <div class="row"><span class="label">MEREK</span><span class="val">: ${u(data.merk)}</span></div>
+                        <div class="row"><span class="label">TIPE</span><span class="val">: ${u(data.tipe)}</span></div>
+                        <div class="row"><span class="label">TAHUN / WARNA</span><span class="val">: ${u(data.tahun)} / ${u(data.warna)}</span></div>
+                        <div class="row"><span class="label">SILINDER</span><span class="val">: ${u(data.isi_silinder)} CC</span></div>
+                        <div class="row"><span class="label">NO. RANGKA</span><span class="val">: ${u(data.no_rangka)}</span></div>
+                        <div class="row"><span class="label">NO. MESIN</span><span class="val">: ${u(data.no_mesin)}</span></div>
+                        
+                        <div class="res-section">DOKUMEN RESMI : ⬇️</div>
+                        <div class="row"><span class="label">TGL DAFTAR</span><span class="val">: ${u(data.tgl_daftar)}</span></div>
 
-    function renderResult(d) {
-        const container = document.getElementById('resultContent');
-        const up = (t) => (t ? t.toString().toUpperCase() : '-');
-
-        container.innerHTML = `
-            <div class="fade-in" style="border:1px solid var(--gold-primary); border-radius:15px; overflow:hidden;">
-                <div class="res-banner">APLIKASI CS.ID</div>
-                <div style="padding:20px;">
-                    <div class="res-section-title">IDENTITAS PEMILIK : ⬇️</div>
-                    <div class="res-line"><span class="res-label">NO. POLISI</span><span class="res-val">: ${up(d.nopol)}</span></div>
-                    <div class="res-line"><span class="res-label">PEMILIK</span><span class="res-val">: ${up(d.nama_pemilik)}</span></div>
-                    <div class="res-line"><span class="res-label">ALAMAT</span><span class="res-val">: ${up(d.alamat)}</span></div>
-                    <div class="res-line"><span class="res-label">NIK</span><span class="res-val">: ${up(d.nik)}</span></div>
-                    <div class="res-line"><span class="res-label">PEKERJAAN</span><span class="res-val">: ${up(d.pekerjaan)}</span></div>
-                    
-                    <div class="res-section-title">DATA KENDARAAN : ⬇️</div>
-                    <div class="res-line"><span class="res-label">MEREK</span><span class="res-val">: ${up(d.merk)}</span></div>
-                    <div class="res-line"><span class="res-label">TIPE</span><span class="res-val">: ${up(d.tipe)}</span></div>
-                    <div class="res-line"><span class="res-label">TAHUN</span><span class="res-val">: ${up(d.tahun)}</span></div>
-                    <div class="res-line"><span class="res-label">WARNA</span><span class="res-val">: ${up(d.warna)}</span></div>
-                    <div class="res-line"><span class="res-label">SILINDER</span><span class="res-val">: ${up(d.isi_silinder)} CC</span></div>
-                    <div class="res-line"><span class="res-label">RODA</span><span class="res-val">: ${up(d.jumlah_roda)}</span></div>
-                    <div class="res-line"><span class="res-label">NO. RANGKA</span><span class="res-val">: ${up(d.no_rangka)}</span></div>
-                    <div class="res-line"><span class="res-label">NO. MESIN</span><span class="res-val">: ${up(d.no_mesin)}</span></div>
-                    
-                    <div class="res-section-title">DOKUMEN RESMI : ⬇️</div>
-                    <div class="res-line"><span class="res-label">NO. BPKB</span><span class="res-val">: ${up(d.no_bpkb)}</span></div>
-                    <div class="res-line"><span class="res-label">NO. STNK</span><span class="res-val">: ${up(d.no_stnk)}</span></div>
-                    <div class="res-line"><span class="res-label">TANGGAL DAFTAR</span><span class="res-val">: ${up(d.tgl_daftar)}</span></div>
-
-                    <div style="margin-top:20px; padding:12px; border:1px dashed var(--gold-primary); font-size:0.75em; line-height:1.5;">
-                        <span style="color:var(--gold-primary); font-weight:800;">NOTE : 📓</span><br>
-                        ALAT UNTUK MENGUNGKAPKAN IDENTITAS RESMI KEPEMILIKAN KENDARAAN YANG SAH.
-                    </div>
-
-                    <div style="margin-top:15px; text-align:center; font-size:0.75em;">
-                        <span style="color:var(--text-secondary);">CP LINK APLIKASI : CS.ID 👥</span><br>
-                        <a href="https://wa.me" style="color:var(--gold-primary); text-decoration:none; font-weight:800;">https://wa.me</a>
-                    </div>
-
-                    <button class="wa-btn" onclick="shareWA()">
-                        BAGIKAN KE WHATSAPP 📲
-                    </button>
-                </div>
-            </div>`;
+                        <div style="margin-top:20px; padding:12px; border:1px dashed var(--gold); font-size:0.75em; line-height:1.5;">
+                            <b>NOTE : 📓</b><br>ALAT UNTUK MENGUNGKAPKAN IDENTITAS RESMI KEPEMILIKAN KENDARAAN YANG SAH.
+                        </div>
+                        <button class="btn-gold" style="background:#25D366; color:white; margin-top:20px;" onclick="shareWA()">BAGIKAN KE WHATSAPP 📲</button>
+                    </div>`;
+            } else { out.innerHTML = `<div style="padding:50px; text-align:center; color:var(--danger); font-weight:800;">DATA TIDAK DITEMUKAN</div>`; }
+        } catch(e) { out.innerHTML = `<div style="padding:50px; text-align:center; color:var(--danger);">GAGAL KONEKSI SERVER</div>`; }
     }
 
     function shareWA() {
-        const d = window.lastData;
-        if(!d) return;
-        const up = (t) => (t ? t.toString().toUpperCase() : '-');
-        
-        let m = `*APLIKASI CS.ID*\n\n`;
-        m += `*IDENTITAS PEMILIK :* ⬇️\n`;
-        m += `NO. POLISI : ${up(d.nopol)}\nPEMILIK : ${up(d.nama_pemilik)}\nALAMAT : ${up(d.alamat)}\nNIK : ${up(d.nik)}\nPEKERJAAN : ${up(d.pekerjaan)}\n\n`;
-        m += `*DATA KENDARAAN :* ⬇️\n`;
-        m += `MEREK : ${up(d.merk)}\nTIPE : ${up(d.tipe)}\nTAHUN : ${up(d.tahun)}\nWARNA : ${up(d.warna)}\nSILINDER : ${up(d.isi_silinder)} CC\nRODA : ${up(d.jumlah_roda)}\nNO. RANGKA : ${up(d.no_rangka)}\nNO. MESIN : ${up(d.no_mesin)}\n\n`;
-        m += `*DOKUMEN RESMI :* ⬇️\n`;
-        m += `NO. BPKB : ${up(d.no_bpkb)}\nNO. STNK : ${up(d.no_stnk)}\nTANGGAL DAFTAR : ${up(d.tgl_daftar)}\n\n`;
-        m += `*NOTE :* 📓\nALAT UNTUK MENGUNGKAPKAN IDENTITAS RESMI KEPEMILIKAN KENDARAAN YANG SAH.\n\n`;
-        m += `*CP LINK APLIKASI : CS.ID* 👥\nhttps://wa.me`;
-
+        const x = window.last; if(!x) return;
+        const u = (t) => (t ? t.toString().toUpperCase() : '-');
+        let m = `*APLIKASI CS.ID*\n\n*IDENTITAS PEMILIK :* ⬇️\nNO. POLISI : ${u(x.nopol)}\nPEMILIK : ${u(x.nama_pemilik)}\nNIK : ${u(x.nik)}\n\n*DATA KENDARAAN :* ⬇️\nMEREK : ${u(x.merk)}\nTIPE : ${u(x.tipe)}\nNO. RANGKA : ${u(x.no_rangka)}\nNO. MESIN : ${u(x.no_mesin)}\n\n*NOTE :* 📓\nALAT UNTUK MENGUNGKAPKAN IDENTITAS RESMI KEPEMILIKAN KENDARAAN YANG SAH.\n\nCP : https://wa.me`;
         window.open(`https://wa.me{encodeURIComponent(m)}`, '_blank');
     }
 </script>
