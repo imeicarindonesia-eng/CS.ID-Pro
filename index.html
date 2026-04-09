@@ -1,0 +1,654 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CS.ID - Aplikasi Data Samsat Nasional</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/000000/car-auth.png">
+    
+    <!-- Ikon Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-dark: #000000;
+            --bg-light: #121212;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --gold-primary: #FFD700;
+            --gold-secondary: #E6C200;
+            --danger: #ff4d4d;
+            --success: #2ecc71;
+            --warning: #f1c40f;
+            --border-color: #2a2a2a;
+            --border-radius: 14px;
+            --font-family: 'Poppins', sans-serif;
+            --kb-bg: #1e1e1e; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: var(--font-family);
+            background-color: #080808;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--bg-dark);
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Header --- */
+        .header {
+            background-color: var(--bg-light);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--gold-primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 { font-size: 1.25em; font-weight: 800; color: var(--gold-primary); letter-spacing: 1px; }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .user-info { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--gold-secondary); font-weight: 600; }
+        .expiry-badge { font-size: 0.6rem; background: rgba(255, 215, 0, 0.1); color: var(--gold-primary); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 215, 0, 0.3); }
+
+        /* --- Content Area --- */
+        .content-area { flex-grow: 1; padding: 20px; padding-bottom: 120px; overflow-y: auto; }
+        .card { background-color: var(--bg-light); border-radius: var(--border-radius); padding: 24px; margin-bottom: 20px; border: 1px solid var(--border-color); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+
+        /* --- Forms --- */
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; color: var(--gold-primary); font-size: 0.75em; font-weight: 700; text-transform: uppercase; }
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1em;
+            outline: none;
+        }
+        .input-group input:focus { border-color: var(--gold-primary); box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+
+        /* --- Buttons --- */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background: linear-gradient(135deg, var(--gold-primary), #B8860B); color: #000; }
+        .btn-success { background: #27ae60; color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+
+        /* --- Custom Keyboard --- */
+        .kb-container { background-color: var(--kb-bg); padding: 15px; border-radius: 15px; margin-top: 20px; }
+        #plateView {
+            background: #000;
+            border: 2px solid var(--gold-primary);
+            padding: 22px;
+            text-align: center;
+            color: var(--gold-primary);
+            font-size: 2.4em;
+            font-weight: 900;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            min-height: 85px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+        }
+        .kb-row-top { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 12px; }
+        .kb-row-alpha { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+        .key {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.4em;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .key:active { background: var(--gold-primary); color: #000; }
+        .key-search {
+            grid-column: span 3;
+            background: linear-gradient(135deg, var(--gold-primary), #B8860B);
+            color: #000;
+            font-size: 0.7em;
+            text-align: center;
+            border: 2px solid #fff;
+            line-height: 1.2;
+            font-weight: 900;
+        }
+
+        /* --- Result Detail --- */
+        .result-card { background-color: var(--bg-light); border-radius: 16px; overflow: hidden; border: 1px solid var(--gold-primary); padding-bottom: 15px; }
+        .res-banner { background: var(--gold-primary); color: #000; padding: 15px; font-weight: 900; text-align: center; font-size: 1.2em; }
+        .res-body { padding: 20px; }
+        .res-section-title { color: var(--gold-primary); font-size: 0.95em; font-weight: 800; margin: 25px 0 12px 0; border-bottom: 1px solid #333; padding-bottom: 8px; }
+        .res-line { display: flex; margin-bottom: 10px; font-size: 0.9em; align-items: flex-start; }
+        .res-label { width: 120px; color: var(--text-secondary); flex-shrink: 0; }
+        .res-sep { width: 15px; color: var(--text-secondary); }
+        .res-val { color: #fff; font-weight: 600; flex: 1; word-break: break-word; text-transform: uppercase; }
+
+        /* --- Nav Bar --- */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-light);
+            display: flex;
+            justify-content: space-around;
+            padding: 14px 0;
+            border-top: 2px solid var(--gold-primary);
+            z-index: 200;
+        }
+        .nav-item { flex: 1; text-align: center; color: var(--text-secondary); font-size: 0.75em; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; }
+        .nav-item.active { color: var(--gold-primary); }
+        .notification-dot {
+            position: absolute;
+            top: -5px;
+            right: 25%;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border: 2px solid var(--bg-light);
+        }
+
+        /* --- Modal & Loader --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.96); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 25px; backdrop-filter: blur(5px); }
+        .loader { border: 6px solid #222; border-top: 6px solid var(--gold-primary); border-radius: 50%; width: 60px; height: 60px; animation: spin 0.8s linear infinite; margin-bottom: 25px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .badge-active { background: var(--success); color: #fff; }
+        .badge-pending { background: var(--warning); color: #000; }
+        .badge-blocked { background: var(--danger); color: #fff; }
+    </style>
+</head>
+<body>
+
+    <!-- MODAL: PIN ADMIN -->
+    <div id="pinModal" class="modal-overlay">
+        <div class="card" style="text-align: center; width: 100%; max-width: 340px;">
+            <i data-lucide="shield-check" style="color:var(--gold-primary); margin: 0 auto 15px; width: 50px; height: 50px;"></i>
+            <h3 style="color:var(--gold-primary); margin-bottom: 12px; font-weight: 800;">MODE ADMIN</h3>
+            <input type="password" id="pinInput" placeholder="••••••" style="width: 100%; padding: 20px; background: #000; border: 2px solid var(--gold-primary); color: #fff; text-align: center; font-size: 2em; border-radius: 12px; letter-spacing: 12px; outline: none; margin-bottom: 30px;">
+            <div style="display: flex; gap: 15px;">
+                <button class="btn btn-primary" style="flex:1" onclick="validatePin()">MASUK</button>
+                <button class="btn" style="flex:1; background: #333; color: #fff;" onclick="closePinModal()">BATAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: INFO -->
+    <div id="alertModal" class="modal-overlay">
+        <div class="card" style="text-align: center; width: 100%; max-width: 320px;">
+            <h3 id="alertTitle" style="color:var(--gold-primary); margin-bottom: 12px; font-weight: 800;">INFO</h3>
+            <p id="alertMsg" style="margin-bottom: 30px; font-size: 1em; line-height: 1.6; color: #eee;"></p>
+            <button class="btn btn-primary" id="alertOkBtn">MENGERTI</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- HEADER -->
+        <div id="appHeader" class="header hidden">
+            <h1>CS-ID SAMSAT</h1>
+            <div class="header-right">
+                <i data-lucide="share-2" style="width: 24px; color: var(--gold-primary); cursor: pointer;" onclick="shareAppWa()"></i>
+                <div class="user-info">
+                    <span id="headerName">USER</span>
+                    <span id="headerExpiry" class="expiry-badge">30H</span>
+                    <i data-lucide="log-out" style="width: 22px; color: var(--danger); cursor: pointer;" onclick="logout()"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- HALAMAN: LOGIN -->
+            <div id="loginPage" class="page">
+                <div style="text-align: center; margin: 50px 0 30px 0;">
+                    <h1 style="font-size: 5.5em; color: var(--gold-primary); font-weight: 900; line-height: 0.9; letter-spacing: -3px;">CS.ID</h1>
+                    <p style="color: var(--gold-primary); letter-spacing: 2px; font-weight: 700; margin-top: 15px; font-size: 1em;">DATA SAMSAT NASIONAL</p>
+                </div>
+                <div class="card">
+                    <div class="input-group"><label>USERNAME</label><input type="text" id="loginUser" placeholder="Masukkan ID"></div>
+                    <div class="input-group"><label>PASSWORD</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+                    <button class="btn btn-primary" id="btnLogin" onclick="handleLogin()">MASUK SISTEM</button>
+                    <button class="btn" style="background:#222; color:var(--gold-primary); border: 1px solid var(--gold-primary); margin-top: 15px;" onclick="openPinModal()">AKSES ADMIN</button>
+                    <div style="text-align: center; margin-top: 40px;">
+                        <p style="font-size: 0.9em; margin-bottom: 8px; color: var(--text-secondary);">Belum memiliki ID akses?</p>
+                        <a href="#" onclick="showPage('regPage')" style="color: var(--gold-primary); font-weight: 800; text-decoration: none; font-size: 1.1em;">Daftar Jadi Agen</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN: DAFTAR -->
+            <div id="regPage" class="page hidden">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;"><i data-lucide="arrow-left" style="cursor: pointer; color: var(--gold-primary);" onclick="showPage('loginPage')"></i><h2 style="color: var(--gold-primary); font-weight: 800;">DAFTAR BARU</h2></div>
+                <div class="card">
+                    <div class="input-group"><label>NAMA LENGKAP</label><input type="text" id="regName" placeholder="Contoh: Muhammad Bintang"></div>
+                    <div class="input-group"><label>ID PENGGUNA (HURUF KECIL)</label><input type="text" id="regUser" placeholder="Contoh: bintang99"></div>
+                    <div class="input-group"><label>NOMOR WHATSAPP</label><input type="tel" id="regWa" placeholder="0812XXXXXXXX"></div>
+                    <div class="input-group" style="margin-bottom: 30px;"><label>PASSWORD</label><input type="text" id="regPass" placeholder="******"></div>
+                    <button class="btn btn-primary" id="btnSubmitReg" onclick="handleRegister()">KIRIM PENDAFTARAN</button>
+                </div>
+            </div>
+
+            <!-- HALAMAN: CARI -->
+            <div id="dashPage" class="page hidden">
+                <div id="plateView">MASUKKAN PLAT</div>
+                <div class="kb-container">
+                    <div class="kb-row-top">
+                        <div class="key" onclick="press('BACK')"><i data-lucide="delete"></i></div>
+                        <div class="key" onclick="press('1')">1</div><div class="key" onclick="press('2')">2</div><div class="key" onclick="press('3')">3</div>
+                        <div class="key" onclick="press('CLR')">DEL</div>
+                    </div>
+                    <div class="kb-row-top">
+                        <div class="key" onclick="press('O')">O</div>
+                        <div class="key" onclick="press('4')">4</div><div class="key" onclick="press('5')">5</div><div class="key" onclick="press('6')">6</div>
+                        <div class="key" onclick="press('O')">O</div>
+                    </div>
+                    <div class="kb-row-top">
+                        <div class="key key-empty" style="opacity:0"></div>
+                        <div class="key" onclick="press('7')">7</div><div class="key" onclick="press('8')">8</div><div class="key" onclick="press('9')">9</div>
+                        <div class="key key-empty" style="opacity:0"></div>
+                    </div>
+                    <div class="kb-row-alpha" id="alphaGrid"></div>
+                </div>
+            </div>
+
+            <!-- HALAMAN: HASIL -->
+            <div id="resultPage" class="page hidden">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;"><i data-lucide="arrow-left" style="cursor: pointer; color: var(--gold-primary);" onclick="showPage('dashPage')"></i><h2 style="font-weight: 800; color: var(--gold-primary);">HASIL PENCARIAN</h2></div>
+                <div id="resultContent"></div>
+                <div id="actionButtons" class="hidden" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; padding-bottom: 60px;">
+                    <button class="btn btn-primary" onclick="copyResult()">SALIN DATA</button>
+                    <button class="btn btn-success" onclick="shareWa()">KIRIM WA</button>
+                </div>
+            </div>
+
+            <!-- HALAMAN: ADMIN -->
+            <div id="adminPage" class="page hidden">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;"><i data-lucide="arrow-left" style="cursor: pointer; color: var(--gold-primary);" onclick="switchTab('search')"></i><h2 style="color: var(--gold-primary); font-weight: 800;">PANEL ADMIN</h2></div>
+                <div id="adminStats" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px;"></div>
+                <div id="agentList"></div>
+            </div>
+        </div>
+
+        <div id="footerNav" class="nav-bar hidden">
+            <div class="nav-item active" id="nav-search" onclick="switchTab('search')"><i data-lucide="keyboard"></i>Cari</div>
+            <div class="nav-item" id="nav-scan" onclick="switchTab('scan')"><i data-lucide="qr-code"></i>Scan</div>
+            <div class="nav-item" id="nav-history" onclick="switchTab('history')"><i data-lucide="history"></i>Riwayat</div>
+            <div class="nav-item hidden" id="nav-admin" onclick="switchTab('admin')">
+                <i data-lucide="shield-check"></i>Admin
+                <span id="adminBadge" class="notification-dot hidden">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, deleteDoc, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // CONFIG (Replace with your actual Firebase config)
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'samsat-nasional-v3';
+
+        const ADMIN_PIN = "280189";
+        const WA_ADMIN_NUMBER = "628136900872";
+        const API_KEY = "9611bbce88d6dbd96cdfd83619233efb";
+        const API_BASE = "https://elangninja.space/";
+        
+        let currentPlate = "";
+        let currentUser = null;
+        let isAdmin = false;
+        let lastResult = null;
+        let allAgents = [];
+        let agentUnsubscribe = null;
+
+        // --- SISTEM AUTH ROBUST ---
+        const ensureAuth = async () => {
+            if (auth.currentUser) return auth.currentUser;
+            
+            return new Promise((resolve) => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        unsubscribe();
+                        resolve(user);
+                    }
+                });
+                
+                const startAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (e) {
+                        console.error("Auth Fail", e);
+                        setTimeout(() => resolve(null), 5000);
+                    }
+                };
+                startAuth();
+            });
+        };
+
+        window.showPage = (id) => {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            if (document.getElementById(id)) document.getElementById(id).classList.remove('hidden');
+            const isAuth = !['loginPage', 'regPage'].includes(id);
+            document.getElementById('appHeader').classList.toggle('hidden', !isAuth);
+            document.getElementById('footerNav').classList.toggle('hidden', !isAuth);
+            lucide.createIcons();
+        };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(document.getElementById('nav-'+tab)) document.getElementById('nav-'+tab).classList.add('active');
+            if (tab === 'search') showPage('dashPage');
+            if (tab === 'admin') showPage('adminPage');
+        };
+
+        window.handleLogin = async () => {
+            const u = document.getElementById('loginUser').value.trim().toLowerCase();
+            const p = document.getElementById('loginPass').value;
+            if(!u || !p) return showAlert("INFO", "Masukkan ID dan Password.");
+            
+            const btn = document.getElementById('btnLogin');
+            btn.disabled = true;
+            btn.innerText = "MEMERIKSA...";
+            
+            try {
+                const authUser = await ensureAuth();
+                if (!authUser) throw new Error("Akses jaringan tidak sedia.");
+
+                if (u === "bintang" && p === "Adamkinan") {
+                    currentUser = { name: "BINTANG", username: "bintang", role: "admin", status: "active" };
+                    isAdmin = true; loginSuccess(); return;
+                }
+                
+                const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'agents', u));
+                if (snap.exists() && snap.data().password === p) {
+                    const data = snap.data();
+                    if (data.status === 'blocked') return showAlert("DITOLAK", "ID Anda dinonaktifkan.");
+                    if (data.status === 'pending') return showAlert("PENDING", "ID sedang menunggu verifikasi.");
+                    currentUser = data; isAdmin = data.role === 'admin'; loginSuccess();
+                } else { showAlert("GAGAL", "Username/Password Salah."); }
+            } catch (e) { showAlert("ERROR", "Cek koneksi internet."); }
+            finally { btn.disabled = false; btn.innerText = "MASUK SISTEM"; }
+        };
+
+        const loginSuccess = () => {
+            localStorage.setItem('samsat_user_v3', JSON.stringify({u: currentUser.username}));
+            document.getElementById('headerName').innerText = currentUser.name.split(' ')[0].toUpperCase();
+            document.getElementById('nav-admin').classList.toggle('hidden', !isAdmin);
+            if (isAdmin) startAdminListener();
+            if (currentUser.expiryDate) {
+                const days = Math.ceil((new Date(currentUser.expiryDate) - new Date()) / 86400000);
+                document.getElementById('headerExpiry').innerText = days > 0 ? days+'H' : 'Habis';
+            }
+            showPage('dashPage');
+        };
+
+        // --- SISTEM PENDAFTARAN SUPER STABIL ---
+        window.handleRegister = async () => {
+            const name = document.getElementById('regName').value.trim();
+            const userID = document.getElementById('regUser').value.trim().toLowerCase();
+            const waNum = document.getElementById('regWa').value.trim();
+            const pass = document.getElementById('regPass').value;
+
+            if(!name || !userID || !waNum || !pass) return showAlert("INFO", "Lengkapkan seluruh data.");
+            
+            const btn = document.getElementById('btnSubmitReg');
+            btn.disabled = true;
+            btn.innerText = "MENGIRIM...";
+            
+            try {
+                const authUser = await ensureAuth();
+                if(!authUser) throw new Error("Database belum siap.");
+
+                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'agents', userID);
+                const snap = await getDoc(ref);
+                
+                if (snap.exists()) { 
+                    btn.disabled = false; 
+                    btn.innerText = "KIRIM PENDAFTARAN"; 
+                    return showAlert("GAGAL", "ID Pengguna sudah ada."); 
+                }
+                
+                // Simpan ke database
+                await setDoc(ref, { 
+                    name: name.toUpperCase(), 
+                    username: userID, 
+                    whatsapp: waNum, 
+                    password: pass, 
+                    status: 'pending', 
+                    role: 'agent', 
+                    createdAt: new Date().toISOString() 
+                });
+                
+                const msgText = `*PENDAFTARAN AGEN BARU CS.ID*\n\nHalo Admin, saya sudah mendaftar melalui aplikasi:\n\n• Nama: *${name.toUpperCase()}*\n• ID Pengguna: *${userID}*\n• No. WA: *${waNum}*\n\n_Mohon bantu verifikasi akun saya._`;
+                const waRedirect = `https://api.whatsapp.com/send?phone=${WA_ADMIN_NUMBER}&text=${encodeURIComponent(msgText)}`;
+                
+                showAlert("BERHASIL", "Pendaftaran terkirim! Silakan klik OKE untuk konfirmasi ke WhatsApp Admin.");
+                
+                document.getElementById('alertOkBtn').onclick = () => {
+                    window.location.href = waRedirect;
+                };
+
+            } catch (e) { 
+                console.error("Reg Error:", e);
+                // Force WhatsApp even if database write fails partially
+                const msgText = `*PENDAFTARAN AGEN BARU CS.ID*\n(Manual Register)\nNama: ${name.toUpperCase()}\nID: ${userID}`;
+                const waRedirect = `https://api.whatsapp.com/send?phone=${WA_ADMIN_NUMBER}&text=${encodeURIComponent(msgText)}`;
+                showAlert("INFO", "Sistem sibuk. Silakan daftar manual via WhatsApp.");
+                document.getElementById('alertOkBtn').onclick = () => { window.location.href = waRedirect; };
+            }
+            finally { btn.disabled = false; btn.innerText = "KIRIM PENDAFTARAN"; }
+        };
+
+        const startAdminListener = () => {
+            if (agentUnsubscribe) agentUnsubscribe();
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'agents'));
+            agentUnsubscribe = onSnapshot(q, (snapshot) => {
+                allAgents = []; snapshot.forEach(d => allAgents.push(d.data()));
+                const pCount = allAgents.filter(a => a.status === 'pending').length;
+                const b = document.getElementById('adminBadge');
+                if(b) { b.innerText = pCount; b.classList.toggle('hidden', pCount === 0); }
+                renderAgents(allAgents);
+            });
+        };
+
+        const renderAgents = (list) => {
+            const stats = { total: list.length, active: list.filter(a=>a.status==='active').length, pending: list.filter(a=>a.status==='pending').length };
+            const stEl = document.getElementById('adminStats');
+            if(stEl) stEl.innerHTML = `<div class="card" style="padding:10px; text-align:center;"><div style="font-size:0.6em; color:var(--text-secondary);">TOTAL</div><div style="font-weight:800; color:var(--gold-primary);">${stats.total}</div></div><div class="card" style="padding:10px; text-align:center;"><div style="font-size:0.6em; color:var(--success);">AKTIF</div><div style="font-weight:800; color:var(--success);">${stats.active}</div></div><div class="card" style="padding:10px; text-align:center;"><div style="font-size:0.6em; color:var(--warning);">PENDING</div><div style="font-weight:800; color:var(--warning);">${stats.pending}</div></div>`;
+            const lsEl = document.getElementById('agentList');
+            if(lsEl) lsEl.innerHTML = list.sort((a,b) => a.status==='pending'?-1:1).map(a => `<div class="card fade-in" style="padding: 15px; border-left: 4px solid ${a.status==='active'?'var(--success)':(a.status==='blocked'?'var(--danger)':'var(--warning)')}"><div style="display:flex; justify-content:space-between;"><div><div style="font-weight:700; color:var(--gold-primary);">${a.name}</div><div style="font-size:0.75em; color:#888;">ID: ${a.username}</div></div><span class="badge badge-${a.status}">${a.status}</span></div><div style="display:flex; gap:10px; margin-top:15px;">${a.status==='pending'||a.status==='blocked' ? `<button class="btn btn-primary" style="padding:8px; font-size:0.7em; flex:1.5;" onclick="updateAgent('${a.username}', 'active', true)">AKTIFKAN (30H)</button>` : ''}${a.status==='active' ? `<button class="btn btn-danger" style="padding:8px; font-size:0.7em; flex:1;" onclick="updateAgent('${a.username}', 'blocked', false)">MATIKAN ID</button>` : ''}<button class="btn" style="padding:8px; font-size:0.7em; background:#333; color:#fff; flex:1;" onclick="deleteAgent('${a.username}')">HAPUS</button></div></div>`).join('');
+        };
+
+        window.updateAgent = async (u, s, exp) => {
+            const data = { status: s };
+            if(exp) { let d = new Date(); d.setDate(d.getDate()+30); data.expiryDate = d.toISOString(); }
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'agents', u), data);
+        };
+        window.deleteAgent = async (u) => { if(confirm('Hapus agen ini secara permanen?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'agents', u)); };
+
+        // --- PENCARIAN ---
+        window.press = (v) => { if(v === 'BACK') currentPlate = currentPlate.slice(0, -1); else if(v === 'CLR') currentPlate = ""; else if(currentPlate.length < 15) currentPlate += v; document.getElementById('plateView').innerText = currentPlate || "MASUKKAN PLAT"; };
+        
+        const fetchSamsat = async () => {
+            if(!currentPlate) return;
+            showPage('resultPage');
+            const container = document.getElementById('resultContent');
+            const actionBtns = document.getElementById('actionButtons');
+            actionBtns.classList.add('hidden');
+            container.innerHTML = `<div class="loader-container fade-in"><div class="loader"></div><p style="color: var(--gold-primary); font-weight: 800;">MENCARI DATA...</p></div>`;
+            try {
+                const res = await fetch(`${API_BASE}?key=${API_KEY}&s=${currentPlate.replace(/\s/g,'')}`);
+                const data = await res.json();
+                if(data && data.length > 0) { lastResult = data[0]; renderResult(data[0]); actionBtns.classList.remove('hidden'); actionBtns.style.display = 'grid'; }
+                else { container.innerHTML = `<div class="card" style="text-align:center; color:var(--danger); padding: 50px 20px; font-weight:700;">DATA TIDAK DITEMUKAN</div>`; }
+            } catch (e) { container.innerHTML = `<div class="card" style="text-align:center; color:var(--danger); padding: 50px 20px;">ERROR KONEKSI</div>`; }
+        };
+
+        const renderResult = (d) => {
+            const p = `${d.plate_region||''} ${d.plate_number||''} ${d.plate_series||''}`.trim() || currentPlate;
+            document.getElementById('resultContent').innerHTML = `
+                <div class="result-card fade-in">
+                    <div class="res-banner">APLIKASI CS.ID</div>
+                    <div class="res-body">
+                        <div class="res-section-title">IDENTITAS PEMILIK : ⬇️</div>
+                        <div class="res-line"><span class="res-label">NO. POLISI</span><span class="res-sep">:</span><span class="res-val">${p}</span></div>
+                        <div class="res-line"><span class="res-label">PEMILIK</span><span class="res-sep">:</span><span class="res-val">${d.owner_name || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">ALAMAT</span><span class="res-sep">:</span><span class="res-val">${d.owner_address || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">NIK</span><span class="res-sep">:</span><span class="res-val">${d.nik || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">PEKERJAAN</span><span class="res-sep">:</span><span class="res-val">${d.owner_job || '-'}</span></div>
+                        <div class="res-section-title">DATA KENDARAAN : ⬇️</div>
+                        <div class="res-line"><span class="res-label">MEREK</span><span class="res-sep">:</span><span class="res-val">${d.brand || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">TIPE</span><span class="res-sep">:</span><span class="res-val">${d.vehicle_type || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">TAHUN</span><span class="res-sep">:</span><span class="res-val">${d.manufacture_year || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">WARNA</span><span class="res-sep">:</span><span class="res-val">${d.color || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">SILINDER</span><span class="res-sep">:</span><span class="res-val">${d.engine_capacity_cc || '-'} CC</span></div>
+                        <div class="res-line"><span class="res-label">RODA</span><span class="res-sep">:</span><span class="res-val">${d.wheel_count || '0'}</span></div>
+                        <div class="res-line"><span class="res-label">NO. RANGKA</span><span class="res-sep">:</span><span class="res-val">${d.chassis_number || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">NO. MESIN</span><span class="res-sep">:</span><span class="res-val">${d.engine_number || '-'}</span></div>
+                        <div class="res-section-title">DOKUMEN RESMI : ⬇️</div>
+                        <div class="res-line"><span class="res-label">NO. BPKB</span><span class="res-sep">:</span><span class="res-val">${d.bpkb_number || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">NO. STNK</span><span class="res-sep">:</span><span class="res-val">${d.stnk_number || '-'}</span></div>
+                        <div class="res-line"><span class="res-label">TANGGAL DAFTAR</span><span class="res-sep">:</span><span class="res-val">${d.registration_date || '-'}</span></div>
+                        <div class="res-section-title">NOTE : ⬇️</div>
+                        <p style="font-size: 11px; text-align: justify; line-height: 1.6; color:#fff;">DATA TNKB INI SESUAI DENGAN IDENTITAS RESMI KEPEMILIKAN YANG SAH MENURUT UU YANG BERLAKU.</p>
+                        <p style="font-size: 11px; color: var(--gold-primary); margin-top: 15px; font-weight: 700;">CP LINK APLIKASI : CS.ID 👥<br>HTTPS://WA.ME/628136900872</p>
+                    </div>
+                </div>`;
+        };
+
+        window.shareWa = () => {
+            if(!lastResult) return;
+            const p = `${lastResult.plate_region||''} ${lastResult.plate_number||''} ${lastResult.plate_series||''}`.trim() || currentPlate;
+            const msg = `*APLIKASI CS.ID*\n\n` +
+                `*IDENTITAS PEMILIK :* ⬇️\nNO. POLISI : ${p.toUpperCase()}\nPEMILIK : ${(lastResult.owner_name || '-').toUpperCase()}\nALAMAT : ${(lastResult.owner_address || '-').toUpperCase()}\nNIK : ${(lastResult.nik || '-').toUpperCase()}\nPEKERJAAN : ${(lastResult.owner_job || '-').toUpperCase()}\n\n` +
+                `*DATA KENDARAAN :* ⬇️\nMEREK : ${(lastResult.brand || '-').toUpperCase()}\nTIPE : ${(lastResult.vehicle_type || '-').toUpperCase()}\nTAHUN : ${(lastResult.manufacture_year || '-').toUpperCase()}\nWARNA : ${(lastResult.color || '-').toUpperCase()}\nSILINDER : ${(lastResult.engine_capacity_cc || '-').toUpperCase()} CC\nRODA : ${(lastResult.wheel_count || '0').toUpperCase()}\nNO. RANGKA : ${(lastResult.chassis_number || '-').toUpperCase()}\nNO. MESIN : ${(lastResult.engine_number || '-').toUpperCase()}\n\n` +
+                `*DOKUMEN RESMI :* ⬇️\nNO. BPKB : ${(lastResult.bpkb_number || '-').toUpperCase()}\nNO. STNK : ${(lastResult.stnk_number || '-').toUpperCase()}\nTANGGAL DAFTAR : ${(lastResult.registration_date || '-').toUpperCase()}\n\n` +
+                `*NOTE :* ⬇️\nDATA TNKB INI SESUAI DENGAN IDENTITAS RESMI KEPEMILIKAN YANG SAH MENURUT UU YANG BERLAKU.\n\n*CP LINK APLIKASI : CS.ID* 👥\nHTTPS://WA.ME/628136900872`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        window.shareAppWa = () => {
+            const appUrl = window.location.href;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('*Aplikasi Data Samsat Nasional (CS.ID)* 🇮🇩\n\nCek data identitas kendaraan secara instan.\n\nLink Aplikasi:\n'+appUrl)}`, '_blank');
+        };
+
+        window.copyResult = () => {
+            if(!lastResult) return;
+            const text = document.getElementById('resultContent').innerText;
+            const el = document.createElement('textarea'); el.value = text;
+            document.body.appendChild(el); el.select();
+            document.execCommand('copy'); document.body.removeChild(el);
+            showAlert("BERHASIL", "Data disalin ke papan klip.");
+        };
+
+        window.showAlert = (t, m) => { 
+            document.getElementById('alertTitle').innerText = t; 
+            document.getElementById('alertMsg').innerText = m; 
+            document.getElementById('alertModal').style.display = 'flex'; 
+        };
+        window.closeAlert = () => { document.getElementById('alertModal').style.display = 'none'; };
+        document.getElementById('alertOkBtn').onclick = closeAlert;
+
+        window.logout = () => { localStorage.removeItem('samsat_user_v3'); location.reload(); };
+        window.validatePin = () => { if (document.getElementById('pinInput').value === ADMIN_PIN) { document.getElementById('loginUser').value = "Bintang"; document.getElementById('loginPass').value = "Adamkinan"; closePinModal(); handleLogin(); } else { showAlert("GAGAL", "PIN Salah!"); } };
+        window.openPinModal = () => { document.getElementById('pinModal').style.display = 'flex'; document.getElementById('pinInput').value = ''; document.getElementById('pinInput').focus(); };
+        window.closePinModal = () => document.getElementById('pinModal').style.display = 'none';
+
+        const initKb = () => {
+            const grid = document.getElementById('alphaGrid'); if(!grid) return;
+            const rows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+            rows[0].split('').forEach(c => addKey(grid, c));
+            rows[1].split('').forEach(c => addKey(grid, c));
+            const spacer = docume<html></html><title></title><b></b>nt.createElement('div'); spacer.className = "key"; spacer.style.visibility = "hidden"; grid.appendChild(spacer);
+            rows[2].split('').forEach(c => addKey(grid, c));
+            const sBtn = document.createElement('div');
+            sBtn.className = 'key key-search'; sBtn.innerHTML = "CEK DATA<br>KENDARAAN";
+            sBtn.onclick = fetchSamsat; grid.appendChild(sBtn);
+        };
+        const addKey = (g, c) => { const k = document.createElement('div'); k.className = 'key'; k.innerText = c; k.onclick = () => press(c); g.appendChild(k); };
+
+        window.onload = async () => {
+            initKb();
+            try { await ensureAuth(); } catch(e) {}
+            const saved = localStorage.getItem('samsat_user_v3');
+            if(saved) {
+                const u = JSON.parse(saved).u;
+                if (u === 'bintang') { isAdmin = true; currentUser = {name: 'BINTANG', username: 'bintang', status: 'active'}; loginSuccess(); }
+                else {
+                    const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'agents', u));
+                    if(snap.exists()) { currentUser = snap.data(); loginSuccess(); }
+                    else showPage('loginPage');
+                }
+            } else showPage('loginPage');
+        };
+    </script>
+</body>
+</html>
