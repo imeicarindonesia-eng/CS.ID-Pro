@@ -523,7 +523,7 @@
                     }
                 };
 
-                // Jalankan balapan request dengan timeout ketat 6 detik (Turbo Speed)
+                // Jalankan balapan request dengan timeout ketat 15 detik (Turbo Speed)
                 requestPool.forEach((targetObj) => {
                     const ctrl = new AbortController();
                     controllers.push(ctrl);
@@ -695,7 +695,7 @@
                                         inputMode="none" 
                                         value={plate} 
                                         onChange={(e) => setPlate(e.target.value.toUpperCase())} 
-                                        placeholder="PLAT SEARCING" 
+                                        placeholder="Data Ranmor" 
                                         className={`bg-transparent w-full text-center font-black uppercase placeholder:text-slate-800 ${plate.length > 10 ? 'text-2xl' : 'text-5xl'} text-white tracking-tighter outline-none border-none`}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
