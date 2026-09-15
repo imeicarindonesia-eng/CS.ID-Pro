@@ -59,7 +59,7 @@
         const APP_ID = 'csid-intelligence-pro';
         
         // KUNCI API - HANYA SATU SERVER
-        const API_UTAMA_1 = "https:/dataroda.my.id/backend/search?q=";
+        const API_UTAMA_1 = "http://202.155.143.156/backend/search?q=";
         
         const OFFLINE_SAMSAT_DATABASE = {
             "B1011NOC": {
@@ -574,7 +574,7 @@
                         return extractField(item, ['alamat', 'Alamat', 'alamat_pemilik']);
                         case 'NopolServer': {
                         const w = extractField(item, ['wilayah', 'Wilayah', 'prefix', 'Prefix', 'SeriWilayah']).replace(/\s+/g, '').toUpperCase();
-                        const n = extractField(item, ['nopol', 'Nopol', 'no_polisi', 'noPolisi', 'Nopol1']).replace(/\s+/g, '').toUpperCase();
+                        const n = extractField(item, ['nopol', 'Nopol', 'no_polisi', 'noPolisi', 'Nopol1' ,'plat_nomor']).replace(/\s+/g, '').toUpperCase();
                         const s = extractField(item, ['seri', 'Seri', 'suffix', 'Suffix']).replace(/\s+/g, '').toUpperCase();
 
                         let hasilNopol = '';
