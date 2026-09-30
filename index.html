@@ -57,8 +57,17 @@
         const APP_ID = 'csid-intelligence-pro';
         
         // DOUBLE API KEY SAMSAT NASIONAL
+        // DOUBLE API KEY SAMSAT NASIONAL
+        const KONEKSI = true;  // ✅ NYALA = true  |  ❌ MATI = false
+
         const API_UTAMA_1 = "https://dataroda.my.id/backend/search?q=";
         const API_UTAMA_2 = "http://202.155.143.156/backend/search?q=";
+        const API_UTAMA_3 = "https://priyamcookware.com/wp-admin/lopon22/lopon23.php?key=lopon23&q=";
+
+        const API_LIST = KONEKSI ? [API_UTAMA_1, API_UTAMA_2, API_UTAMA_3] : [];
+
+        
+        
         
         const OFFLINE_SAMSAT_DATABASE = {
             "B1011NOC": {
